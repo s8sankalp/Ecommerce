@@ -1,0 +1,138 @@
+.home-container {
+  padding: 2rem 4rem;
+  background-color: #f8f9fa;
+}
+
+/* Hero Section */
+.hero-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #e9ecef;
+  border-radius: 1rem;
+  padding: 4rem;
+  margin-bottom: 4rem;
+}
+
+.hero-content {
+  max-width: 50%;
+}
+
+.hero-deal {
+  color: #ff6f61;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+  line-height: 1.2;
+}
+
+.hero-buttons .btn {
+  padding: 1rem 2rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.hero-buttons .btn-primary {
+  background-color: #ff6f61;
+  color: white;
+  margin-right: 1rem;
+}
+
+.hero-buttons .btn-primary:hover {
+  background-color: #e65a50;
+}
+
+.hero-buttons .btn-secondary {
+  background-color: transparent;
+  color: #333;
+}
+
+.hero-buttons .btn-secondary:hover {
+  background-color: #ddd;
+}
+
+.hero-image img {
+  max-width: 400px;
+  height: auto;
+}
+
+/* Popular Products Section */
+.popular-products-section {
+  text-align: center;
+}
+
+.section-title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.product-card {
+  background-color: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+}
+
+.product-image-container {
+  position: relative;
+  background-color: #f1f1f1;
+  padding: 1rem;
+}
+
+.product-image {
+  width: 100%;
+  height: 200px;
+  object-fit: contain;
+}
+
+.wishlist-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.wishlist-button:hover {
+  background-color: #ff6f61;
+  color: white;
+}
+
+.wishlist-button svg {
+  font-size: 1.2rem;
+}
+
+.product-name {
+  padding: 1rem;
+  font-weight: bold;
+  text-align: center;
+} 

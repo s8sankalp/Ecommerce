@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useCart } from '../context/CartContext.tsx';
 import { productsAPI } from '../services/api.ts';
-import { Product, ProductFilters } from '../types';
-import { FaSearch, FaFilter, FaShoppingCart, FaStar } from 'react-icons/fa';
+import { Product, ProductFilters } from '../types/index.ts';
+import { FaShoppingCart, FaStar, FaFilter, FaSort, FaRegHeart, FaHeart, FaTimes } from 'react-icons/fa';
+import './Products.css';
 
 const Products: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -11,33 +12,31 @@ const Products: React.FC = () => {
   const [error, setError] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
   const { addToCart } = useCart();
+  // Using a Set for efficient add/delete of wishlisted items
+  const [wishlist, setWishlist] = useState<Set<string>>(new Set());
 
   const [filters, setFilters] = useState<ProductFilters>({
     keyword: searchParams.get('keyword') || '',
     category: searchParams.get('category') || '',
-    brand: searchParams.get('brand') || '',
     minPrice: searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : undefined,
     maxPrice: searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined,
-    page: searchParams.get('page') ? Number(searchParams.get('page')) : 1
+    page: searchParams.get('page') ? Number(searchParams.get('page')) : 1,
+    sort: searchParams.get('sort') || 'default'
   });
 
-  const [pagination, setPagination] = useState({
-    page: 1,
-    pages: 1,
-    total: 0
-  });
+  const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
 
-  const categories = ['Electronics', 'Clothing', 'Books', 'Home & Garden', 'Sports', 'Beauty', 'Toys', 'Automotive', 'Health', 'Food'];
-  const brands = ['Apple', 'Samsung', 'Nike', 'Adidas', 'Sony', 'LG', 'Dell', 'HP', 'Canon', 'Nikon'];
+  const categories = ['Electronics', 'Clothing', 'Books', 'Home & Garden', 'Sports'];
 
   useEffect(() => {
     fetchProducts();
-  }, [filters]);
+  }, [searchParams]);
 
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await productsAPI.getAll(filters);
+      const params = Object.fromEntries(searchParams.entries());
+      const response = await productsAPI.getAll(params);
       setProducts(response.data.products);
       setPagination({
         page: response.data.page,
@@ -50,198 +49,176 @@ const Products: React.FC = () => {
       setLoading(false);
     }
   };
-
-  const handleFilterChange = (key: keyof ProductFilters, value: string | number | undefined) => {
-    const newFilters = { ...filters, [key]: value, page: 1 };
-    setFilters(newFilters);
-    
-    const params = new URLSearchParams();
-    Object.entries(newFilters).forEach(([k, v]) => {
-      if (v !== undefined && v !== '') {
-        params.set(k, String(v));
-      }
-    });
-    setSearchParams(params);
+  
+  const handleFilterChange = (key: string, value: string | number | undefined) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (value === undefined || value === '' || value === 'default') {
+      newParams.delete(key);
+    } else {
+      newParams.set(key, String(value));
+    }
+    newParams.set('page', '1'); // Reset to first page on filter change
+    setSearchParams(newParams);
   };
-
+  
+  const clearFilters = () => {
+    setSearchParams({});
+  };
+  
   const handleAddToCart = (product: Product) => {
     addToCart(product, 1);
+    // You can add some feedback to the user here
+  };
+  
+  const toggleWishlist = (productId: string) => {
+    const newWishlist = new Set(wishlist);
+    if (newWishlist.has(productId)) {
+      newWishlist.delete(productId);
+    } else {
+      newWishlist.add(productId);
+    }
+    setWishlist(newWishlist);
   };
 
-  const handlePageChange = (page: number) => {
-    handleFilterChange('page', page);
-  };
-
-  if (loading) {
+  const renderPagination = () => {
+    if (pagination.pages <= 1) return null;
+    const pageNumbers = [];
+    for (let i = 1; i <= pagination.pages; i++) {
+      pageNumbers.push(i);
+    }
     return (
-      <div className="loading-container">
-        <div className="spinner"></div>
-        <p>Loading products...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="error-container">
-        <div className="alert alert-error">{error}</div>
-        <button onClick={fetchProducts} className="btn btn-primary">Try Again</button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="products-page">
-      <div className="products-header">
-        <h1>Products</h1>
-        <p>Found {pagination.total} products</p>
-      </div>
-
-      <div className="products-layout">
-        <aside className="filters-sidebar">
-          <h3><FaFilter /> Filters</h3>
-          
-          <div className="filter-section">
-            <h4>Search</h4>
-            <div className="search-box">
-              <FaSearch />
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={filters.keyword || ''}
-                onChange={(e) => handleFilterChange('keyword', e.target.value)}
-                className="form-control"
-              />
-            </div>
-          </div>
-
-          <div className="filter-section">
-            <h4>Category</h4>
-            <select
-              value={filters.category || ''}
-              onChange={(e) => handleFilterChange('category', e.target.value)}
-              className="form-control"
-            >
-              <option value="">All Categories</option>
-              {categories.map(category => (
-                <option key={category} value={category}>{category}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="filter-section">
-            <h4>Brand</h4>
-            <select
-              value={filters.brand || ''}
-              onChange={(e) => handleFilterChange('brand', e.target.value)}
-              className="form-control"
-            >
-              <option value="">All Brands</option>
-              {brands.map(brand => (
-                <option key={brand} value={brand}>{brand}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="filter-section">
-            <h4>Price Range</h4>
-            <div className="price-inputs">
-              <input
-                type="number"
-                placeholder="Min Price"
-                value={filters.minPrice || ''}
-                onChange={(e) => handleFilterChange('minPrice', e.target.value ? Number(e.target.value) : undefined)}
-                className="form-control"
-              />
-              <input
-                type="number"
-                placeholder="Max Price"
-                value={filters.maxPrice || ''}
-                onChange={(e) => handleFilterChange('maxPrice', e.target.value ? Number(e.target.value) : undefined)}
-                className="form-control"
-              />
-            </div>
-          </div>
-
+      <div className="pagination">
+        {pageNumbers.map(number => (
           <button
-            onClick={() => {
-              setFilters({ page: 1 });
-              setSearchParams({});
-            }}
-            className="btn btn-outline"
+            key={number}
+            onClick={() => handleFilterChange('page', number)}
+            className={`pagination-btn ${pagination.page === number ? 'active' : ''}`}
           >
-            Clear Filters
+            {number}
           </button>
-        </aside>
-
-        <main className="products-main">
-          {products.length === 0 ? (
-            <div className="no-products">
-              <h3>No products found</h3>
-              <p>Try adjusting your filters or search terms.</p>
-            </div>
-          ) : (
-            <>
-              <div className="products-grid">
-                {products.map(product => (
-                  <div key={product._id} className="product-card">
-                    <div className="product-image">
-                      <img src={product.images[0] || '/placeholder-product.jpg'} alt={product.name} />
-                      {product.discount > 0 && (
-                        <span className="discount-badge">-{product.discount}%</span>
-                      )}
-                    </div>
-                    
-                    <div className="product-info">
-                      <h3 className="product-title">
-                        <Link to={`/products/${product._id}`}>{product.name}</Link>
-                      </h3>
-                      
-                      <div className="product-rating">
-                        <FaStar className="star-icon" />
-                        <span>{product.rating.toFixed(1)} ({product.numReviews} reviews)</span>
-                      </div>
-                      
-                      <div className="product-price">
-                        <span className="current-price">${product.price.toFixed(2)}</span>
-                        {product.originalPrice && product.originalPrice > product.price && (
-                          <span className="original-price">${product.originalPrice.toFixed(2)}</span>
-                        )}
-                      </div>
-                      
-                      <p className="product-description">{product.description.substring(0, 100)}...</p>
-                      
-                      <div className="product-actions">
-                        <button
-                          onClick={() => handleAddToCart(product)}
-                          className="btn btn-primary"
-                          disabled={product.stock === 0}
-                        >
-                          <FaShoppingCart /> {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {pagination.pages > 1 && (
-                <div className="pagination">
-                  {Array.from({ length: pagination.pages }, (_, i) => i + 1).map(page => (
-                    <button
-                      key={page}
-                      onClick={() => handlePageChange(page)}
-                      className={`btn ${page === pagination.page ? 'btn-primary' : 'btn-outline'}`}
-                    >
-                      {page}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-        </main>
+        ))}
       </div>
+    );
+  };
+
+  const renderProductCard = (product: Product) => (
+    <div key={product._id} className="product-card">
+      <div className="product-image-container">
+        <Link to={`/products/${product._id}`}>
+          <img src={product.images[0] || '/images/placeholder.png'} alt={product.name} className="product-image" />
+        </Link>
+        <button className="wishlist-btn" onClick={() => toggleWishlist(product._id)}>
+          {wishlist.has(product._id) ? <FaHeart color="red" /> : <FaRegHeart />}
+        </button>
+      </div>
+      <div className="product-card-content">
+        <p className="product-category">{product.category}</p>
+        <h3 className="product-name">
+          <Link to={`/products/${product._id}`}>{product.name}</Link>
+        </h3>
+        <div className="product-rating">
+          {[...Array(5)].map((_, i) => (
+            <FaStar key={i} color={i < Math.round(product.rating) ? '#ffc107' : '#e4e5e9'} />
+          ))}
+          <span>({product.numReviews})</span>
+        </div>
+        <div className="product-price">${product.price.toFixed(2)}</div>
+        <button 
+          className="btn-add-to-cart" 
+          onClick={() => handleAddToCart(product)}
+          disabled={product.stock === 0}
+        >
+          {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+        </button>
+      </div>
+    </div>
+  );
+  
+  return (
+    <div className="products-page-container">
+      <aside className="filters-sidebar">
+        <h3><FaFilter /> Filters</h3>
+        <button className="clear-filters-btn" onClick={clearFilters}>
+          <FaTimes /> Clear All
+        </button>
+        <div className="filter-group">
+          <h4>Category</h4>
+          <ul>
+            {categories.map(cat => (
+              <li 
+                key={cat} 
+                onClick={() => handleFilterChange('category', cat)}
+                className={searchParams.get('category') === cat ? 'active' : ''}
+              >
+                {cat}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="filter-group">
+          <h4>Price Range</h4>
+          <div className="price-filter">
+            <input 
+              type="number" 
+              placeholder="Min" 
+              onChange={(e) => handleFilterChange('minPrice', e.target.value)}
+              value={searchParams.get('minPrice') || ''}
+            />
+            <span>-</span>
+            <input 
+              type="number" 
+              placeholder="Max"
+              onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
+              value={searchParams.get('maxPrice') || ''}
+            />
+          </div>
+        </div>
+      </aside>
+      <main className="products-main-content">
+        <div className="products-toolbar">
+          <div className="search-container">
+            <FaShoppingCart className="search-icon" />
+            <input 
+              type="text" 
+              placeholder="Search products..." 
+              onChange={(e) => handleFilterChange('keyword', e.target.value)}
+              value={searchParams.get('keyword') || ''}
+            />
+          </div>
+          <div className="sort-container">
+            <select 
+              onChange={(e) => handleFilterChange('sort', e.target.value)}
+              value={searchParams.get('sort') || 'default'}
+            >
+              <option value="default">Default Sort</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="rating-desc">Top Rated</option>
+            </select>
+          </div>
+        </div>
+        <div className="products-header">
+          <p>Showing {products.length} of {pagination.total} results</p>
+        </div>
+        
+        {loading ? (
+          <div className="loading-container"><div className="spinner"></div></div>
+        ) : error ? (
+          <div className="error-container">{error}</div>
+        ) : products.length > 0 ? (
+          <>
+            <div className="products-grid">
+              {products.map(renderProductCard)}
+            </div>
+            {renderPagination()}
+          </>
+        ) : (
+          <div className="no-products-found">
+            <h2>No Products Found</h2>
+            <p>Try adjusting your filters or clearing them to see all products.</p>
+          </div>
+        )}
+      </main>
     </div>
   );
 };

@@ -1,49 +1,74 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { FaHeart } from 'react-icons/fa';
+import './Home.css';
+
+const products = [
+  {
+    id: 1,
+    name: 'Apple AirPods',
+    image: '/images/airpods.jpg',
+  },
+  {
+    id: 2,
+    name: 'Wireless Headphones',
+    image: '/images/headphones.jpg',
+  },
+  {
+    id: 3,
+    name: 'Samsung Galaxy S23',
+    image: '/images/phone.jpg',
+  },
+  {
+    id: 4,
+    name: 'Smartwatch',
+    image: '/images/watch.jpg',
+  },
+  {
+    id: 5,
+    name: 'PlayStation 5',
+    image: '/images/ps5.jpg',
+  },
+];
 
 const Home: React.FC = () => {
   return (
-    <div>
-      <section className="hero">
-        <h1>Welcome to ShopHub</h1>
-        <p>Discover amazing products at unbeatable prices</p>
-        <Link to="/products" className="btn btn-primary">
-          Shop Now
-        </Link>
+    <div className="home-container">
+      <section className="hero-section">
+        <div className="hero-content">
+          <p className="hero-deal">Exclusive Deal 40% Off</p>
+          <h1 className="hero-title">
+            Power Meets Elegance -<br />
+            Apple MacBook Pro Is Here for you!
+          </h1>
+          <div className="hero-buttons">
+            <Link to="/product/macbook-pro" className="btn btn-primary">
+              Order Now
+            </Link>
+            <Link to="/learn-more" className="btn btn-secondary">
+              Learn More &rarr;
+            </Link>
+          </div>
+        </div>
+        <div className="hero-image">
+          <img src="/images/macbook.png" alt="MacBook Pro" />
+        </div>
       </section>
-      
-      <section>
-        <h2>Featured Categories</h2>
-        <div className="grid grid-3">
-          <div className="card">
-            <div className="card-body">
-              <h3>Electronics</h3>
-              <p>Latest gadgets and technology</p>
-              <Link to="/products?category=Electronics" className="btn btn-outline">
-                Browse Electronics
-              </Link>
+
+      <section className="popular-products-section">
+        <h2 className="section-title">Popular products</h2>
+        <div className="product-grid">
+          {products.map((product) => (
+            <div className="product-card" key={product.id}>
+              <div className="product-image-container">
+                <img src={product.image} alt={product.name} className="product-image" />
+                <button className="wishlist-button">
+                  <FaHeart />
+                </button>
+              </div>
+              <p className="product-name">{product.name}</p>
             </div>
-          </div>
-          
-          <div className="card">
-            <div className="card-body">
-              <h3>Clothing</h3>
-              <p>Fashion and style for everyone</p>
-              <Link to="/products?category=Clothing" className="btn btn-outline">
-                Browse Clothing
-              </Link>
-            </div>
-          </div>
-          
-          <div className="card">
-            <div className="card-body">
-              <h3>Home & Garden</h3>
-              <p>Everything for your home</p>
-              <Link to="/products?category=Home & Garden" className="btn btn-outline">
-                Browse Home & Garden
-              </Link>
-            </div>
-          </div>
+          ))}
         </div>
       </section>
     </div>

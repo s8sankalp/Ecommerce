@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.tsx';
 import { ordersAPI } from '../services/api.ts';
-import { Order } from '../types';
-import { FaArrowLeft, FaTruck, FaCheckCircle, FaClock, FaTimes, FaMapMarkerAlt, FaCreditCard } from 'react-icons/fa';
+import { Order } from '../types/index.ts';
+import AccountNav from '../components/AccountNav.tsx';
+import './Account.css';
+import './OrderDetail.css';
+import { FaArrowLeft, FaTruck, FaCreditCard, FaCalendar } from 'react-icons/fa';
 
 const OrderDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -25,189 +28,87 @@ const OrderDetail: React.FC = () => {
       const response = await ordersAPI.getById(id!);
       setOrder(response.data);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to fetch order');
+      setError(err.response?.data?.message || 'Failed to fetch order details.');
     } finally {
       setLoading(false);
     }
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'Delivered':
-        return <FaCheckCircle className="status-icon delivered" />;
-      case 'Shipped':
-        return <FaTruck className="status-icon shipped" />;
-      case 'Processing':
-        return <FaClock className="status-icon processing" />;
-      case 'Cancelled':
-        return <FaTimes className="status-icon cancelled" />;
-      default:
-        return <FaClock className="status-icon pending" />;
-    }
+  const getStatusBadge = (status: string) => {
+    const statusClass = status.toLowerCase().replace(' ', '-');
+    return <span className={`status-badge ${statusClass}`}>{status}</span>;
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Delivered':
-        return 'delivered';
-      case 'Shipped':
-        return 'shipped';
-      case 'Processing':
-        return 'processing';
-      case 'Cancelled':
-        return 'cancelled';
-      default:
-        return 'pending';
-    }
-  };
-
-  if (!isAuthenticated) {
-    return (
-      <div className="auth-required">
-        <h2>Authentication Required</h2>
-        <p>Please log in to view order details.</p>
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="loading-container">
-        <div className="spinner"></div>
-        <p>Loading order details...</p>
-      </div>
-    );
-  }
-
-  if (error || !order) {
-    return (
-      <div className="error-container">
-        <div className="alert alert-error">{error || 'Order not found'}</div>
-        <button onClick={() => navigate('/orders')} className="btn btn-primary">
-          Back to Orders
-        </button>
-      </div>
-    );
-  }
+  if (authLoading) return <div className="loading-container"><div className="spinner"></div></div>;
+  if (!isAuthenticated) return <div className="error-container">Please log in to view order details.</div>;
+  if (loading) return (
+    <div className="account-page-container">
+      <AccountNav />
+      <div className="account-content"><div className="loading-container"><div className="spinner"></div></div></div>
+    </div>
+  );
+  if (error || !order) return (
+    <div className="account-page-container">
+      <AccountNav />
+      <div className="account-content"><div className="notice error">{error || 'Order not found'}</div></div>
+    </div>
+  );
 
   return (
-    <div className="order-detail-page">
-      <button onClick={() => navigate('/orders')} className="back-btn">
-        <FaArrowLeft /> Back to Orders
-      </button>
-
-      <div className="order-detail-header">
-        <h1>Order #{order._id.slice(-8)}</h1>
-        <div className="order-status-badge">
-          {getStatusIcon(order.status)}
-          <span className={`status-text ${getStatusColor(order.status)}`}>
-            {order.status}
-          </span>
-        </div>
-      </div>
-
-      <div className="order-detail-layout">
-        <div className="order-detail-main">
-          <div className="order-section">
-            <h2>Order Items</h2>
-            <div className="order-items-list">
-              {order.orderItems.map((item, index) => (
-                <div key={index} className="order-item-detail">
-                  <img 
-                    src={item.image || '/placeholder-product.jpg'} 
-                    alt={item.name} 
-                  />
-                  <div className="item-info">
-                    <h3>{item.name}</h3>
-                    <p>Quantity: {item.quantity}</p>
-                    <p className="item-price">${item.price.toFixed(2)} each</p>
-                  </div>
-                  <div className="item-total">
-                    ${(item.price * item.quantity).toFixed(2)}
-                  </div>
-                </div>
-              ))}
-            </div>
+    <div className="account-page-container">
+      <AccountNav />
+      <div className="account-content">
+        <div className="order-detail-header">
+          <div>
+            <Link to="/orders" className="back-to-orders-link"><FaArrowLeft /> Back to Orders</Link>
+            <h1>Order #{order._id.slice(-8)}</h1>
+            <p>Placed on {new Date(order.createdAt).toLocaleDateString()}</p>
           </div>
-
-          <div className="order-section">
-            <h2>Shipping Address</h2>
-            <div className="shipping-address">
-              <FaMapMarkerAlt />
-              <div>
-                <p>{order.shippingAddress.street}</p>
-                <p>
-                  {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipCode}
-                </p>
-                <p>{order.shippingAddress.country}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="order-section">
-            <h2>Payment Information</h2>
-            <div className="payment-info">
-              <FaCreditCard />
-              <div>
-                <p><strong>Payment Method:</strong> {order.paymentMethod}</p>
-                <p><strong>Payment Status:</strong> {order.isPaid ? 'Paid' : 'Pending'}</p>
-                {order.isPaid && order.paidAt && (
-                  <p><strong>Paid On:</strong> {new Date(order.paidAt).toLocaleDateString()}</p>
-                )}
-              </div>
-            </div>
+          <div className="order-header-status">
+            {getStatusBadge(order.status)}
           </div>
         </div>
 
-        <div className="order-detail-sidebar">
-          <div className="order-summary-card">
-            <h3>Order Summary</h3>
-            
-            <div className="order-dates">
-              <div className="date-item">
-                <span>Order Date:</span>
-                <span>{new Date(order.createdAt).toLocaleDateString()}</span>
+        <div className="order-detail-grid">
+          <div className="order-detail-left">
+            <div className="detail-card">
+              <h3>Order Items ({order.orderItems.length})</h3>
+              <div className="ordered-items-list">
+                {order.orderItems.map((item, index) => (
+                  <div key={index} className="ordered-item">
+                    <img src={item.image} alt={item.name} />
+                    <div className="item-info">
+                      <Link to={`/products/${item.product}`}>{item.name}</Link>
+                      <span>Qty: {item.quantity}</span>
+                    </div>
+                    <span className="item-price">${(item.price * item.quantity).toFixed(2)}</span>
+                  </div>
+                ))}
               </div>
-              {order.isDelivered && order.deliveredAt && (
-                <div className="date-item">
-                  <span>Delivered:</span>
-                  <span>{new Date(order.deliveredAt).toLocaleDateString()}</span>
+            </div>
+            <div className="detail-card">
+              <h3>Shipping Address</h3>
+              <p>{order.shippingAddress.street}</p>
+              <p>{order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipCode}</p>
+              <p>{order.shippingAddress.country}</p>
+            </div>
+          </div>
+          <div className="order-detail-right">
+            <div className="detail-card">
+              <h3>Order Summary</h3>
+              <div className="summary-details">
+                <p><span>Subtotal</span> <span>${order.itemsPrice.toFixed(2)}</span></p>
+                <p><span>Shipping</span> <span>${order.shippingPrice.toFixed(2)}</span></p>
+                <p><span>Tax</span> <span>${order.taxPrice.toFixed(2)}</span></p>
+                <div className="summary-total">
+                  <p><span>Total</span> <span>${order.totalPrice.toFixed(2)}</span></p>
                 </div>
-              )}
-            </div>
-
-            <div className="order-totals">
-              <div className="total-row">
-                <span>Subtotal:</span>
-                <span>${order.itemsPrice.toFixed(2)}</span>
               </div>
-              <div className="total-row">
-                <span>Tax:</span>
-                <span>${order.taxPrice.toFixed(2)}</span>
-              </div>
-              <div className="total-row">
-                <span>Shipping:</span>
-                <span>${order.shippingPrice.toFixed(2)}</span>
-              </div>
-              <div className="total-row final">
-                <span>Total:</span>
-                <span>${order.totalPrice.toFixed(2)}</span>
+              <div className="payment-status">
+                <h4>Payment</h4>
+                <p>{order.paymentMethod} - {order.isPaid ? `Paid on ${new Date(order.paidAt!).toLocaleDateString()}` : 'Pending'}</p>
               </div>
             </div>
-
-            {order.trackingNumber && (
-              <div className="tracking-info">
-                <h4>Tracking Information</h4>
-                <p><strong>Tracking Number:</strong> {order.trackingNumber}</p>
-              </div>
-            )}
-
-            {order.notes && (
-              <div className="order-notes">
-                <h4>Order Notes</h4>
-                <p>{order.notes}</p>
-              </div>
-            )}
           </div>
         </div>
       </div>

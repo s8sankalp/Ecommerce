@@ -1,24 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext.tsx';
 import { usersAPI } from '../services/api.ts';
-import { User } from '../types';
+import { User } from '../types/index.ts';
+import AccountNav from '../components/AccountNav.tsx';
+import './Account.css';
 import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaSave } from 'react-icons/fa';
 
 const Profile: React.FC = () => {
-  const { user, isAuthenticated } = useAuth();
-  const [profile, setProfile] = useState<Partial<User>>({
-    name: '',
-    email: '',
-    phone: '',
-    address: {
-      street: '',
-      city: '',
-      state: '',
-      zipCode: '',
-      country: ''
-    }
-  });
-  const [loading, setLoading] = useState(false);
+  const { user, loading: authLoading, isAuthenticated } = useAuth();
+  const [profile, setProfile] = useState<Partial<User>>({});
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -40,21 +30,16 @@ const Profile: React.FC = () => {
     }
   }, [user]);
 
-  const handleChange = (field: string, value: string) => {
-    if (field.includes('.')) {
-      const [parent, child] = field.split('.');
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (name.startsWith('address.')) {
+      const field = name.split('.')[1];
       setProfile(prev => ({
         ...prev,
-        [parent]: {
-          ...(prev[parent as keyof User] as any),
-          [child]: value
-        }
+        address: { ...prev.address, [field]: value } as User['address']
       }));
     } else {
-      setProfile(prev => ({
-        ...prev,
-        [field]: value
-      }));
+      setProfile(prev => ({ ...prev, [name]: value }));
     }
   };
 
@@ -63,176 +48,83 @@ const Profile: React.FC = () => {
     setSaving(true);
     setError('');
     setSuccess('');
-
     try {
       await usersAPI.updateProfile(profile);
       setSuccess('Profile updated successfully!');
+      // Optional: Refresh user context after update
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to update profile');
+      setError(err.response?.data?.message || 'Failed to update profile.');
     } finally {
       setSaving(false);
     }
   };
-
-  if (!isAuthenticated) {
-    return (
-      <div className="auth-required">
-        <h2>Authentication Required</h2>
-        <p>Please log in to view your profile.</p>
-      </div>
-    );
-  }
+  
+  if (authLoading) return <div className="loading-container"><div className="spinner"></div></div>;
+  if (!isAuthenticated) return <div className="error-container">Please log in to view your profile.</div>;
 
   return (
-    <div className="profile-page">
-      <div className="profile-header">
-        <h1>My Profile</h1>
-        <p>Manage your account information and preferences</p>
-      </div>
-
-      {error && <div className="alert alert-error">{error}</div>}
-      {success && <div className="alert alert-success">{success}</div>}
-
-      <div className="profile-layout">
-        <div className="profile-main">
-          <form onSubmit={handleSubmit} className="profile-form">
-            <div className="profile-section">
-              <h2>Personal Information</h2>
-              
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="name" className="form-label">
-                    <FaUser /> Full Name
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    value={profile.name}
-                    onChange={(e) => handleChange('name', e.target.value)}
-                    className="form-control"
-                    required
-                  />
-                </div>
-                
-                <div className="form-group">
-                  <label htmlFor="email" className="form-label">
-                    <FaEnvelope /> Email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    value={profile.email}
-                    onChange={(e) => handleChange('email', e.target.value)}
-                    className="form-control"
-                    required
-                  />
-                </div>
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="phone" className="form-label">
-                  <FaPhone /> Phone Number
-                </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  value={profile.phone || ''}
-                  onChange={(e) => handleChange('phone', e.target.value)}
-                  className="form-control"
-                />
-              </div>
-            </div>
-
-            <div className="profile-section">
-              <h2>Shipping Address</h2>
-              
-              <div className="form-group">
-                <label htmlFor="street" className="form-label">
-                  <FaMapMarkerAlt /> Street Address
-                </label>
-                <input
-                  type="text"
-                  id="street"
-                  value={profile.address?.street || ''}
-                  onChange={(e) => handleChange('address.street', e.target.value)}
-                  className="form-control"
-                />
-              </div>
-              
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="city" className="form-label">City</label>
-                  <input
-                    type="text"
-                    id="city"
-                    value={profile.address?.city || ''}
-                    onChange={(e) => handleChange('address.city', e.target.value)}
-                    className="form-control"
-                  />
-                </div>
-                
-                <div className="form-group">
-                  <label htmlFor="state" className="form-label">State</label>
-                  <input
-                    type="text"
-                    id="state"
-                    value={profile.address?.state || ''}
-                    onChange={(e) => handleChange('address.state', e.target.value)}
-                    className="form-control"
-                  />
-                </div>
-              </div>
-              
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="zipCode" className="form-label">ZIP Code</label>
-                  <input
-                    type="text"
-                    id="zipCode"
-                    value={profile.address?.zipCode || ''}
-                    onChange={(e) => handleChange('address.zipCode', e.target.value)}
-                    className="form-control"
-                  />
-                </div>
-                
-                <div className="form-group">
-                  <label htmlFor="country" className="form-label">Country</label>
-                  <input
-                    type="text"
-                    id="country"
-                    value={profile.address?.country || ''}
-                    onChange={(e) => handleChange('address.country', e.target.value)}
-                    className="form-control"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="profile-actions">
-              <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={saving}
-              >
-                <FaSave /> {saving ? 'Saving...' : 'Save Changes'}
-              </button>
-            </div>
-          </form>
+    <div className="account-page-container">
+      <AccountNav />
+      <div className="account-content">
+        <div className="account-header">
+          <h1>My Profile</h1>
+          <p>Manage your personal information and address.</p>
         </div>
 
-        <div className="profile-sidebar">
-          <div className="profile-card">
-            <div className="profile-avatar">
-              <FaUser />
+        {error && <div className="notice error">{error}</div>}
+        {success && <div className="notice success">{success}</div>}
+
+        <form onSubmit={handleSubmit} className="profile-form">
+          <div className="form-section">
+            <h3>Personal Information</h3>
+            <div className="form-grid">
+              <div className="input-group">
+                <label htmlFor="name"><FaUser /> Full Name</label>
+                <input type="text" id="name" name="name" value={profile.name || ''} onChange={handleChange} required />
+              </div>
+              <div className="input-group">
+                <label htmlFor="email"><FaEnvelope /> Email Address</label>
+                <input type="email" id="email" name="email" value={profile.email || ''} onChange={handleChange} required />
+              </div>
+              <div className="input-group">
+                <label htmlFor="phone"><FaPhone /> Phone Number</label>
+                <input type="tel" id="phone" name="phone" value={profile.phone || ''} onChange={handleChange} />
+              </div>
             </div>
-            <h3>{user?.name}</h3>
-            <p className="profile-email">{user?.email}</p>
-            <p className="profile-role">Role: {user?.role}</p>
-            <p className="profile-member-since">
-              Member since: {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
-            </p>
           </div>
-        </div>
+
+          <div className="form-section">
+            <h3>Shipping Address</h3>
+            <div className="form-grid">
+              <div className="input-group full-width">
+                <label htmlFor="address.street"><FaMapMarkerAlt /> Street Address</label>
+                <input type="text" id="address.street" name="address.street" value={profile.address?.street || ''} onChange={handleChange} />
+              </div>
+              <div className="input-group">
+                <label htmlFor="address.city">City</label>
+                <input type="text" id="address.city" name="address.city" value={profile.address?.city || ''} onChange={handleChange} />
+              </div>
+              <div className="input-group">
+                <label htmlFor="address.state">State</label>
+                <input type="text" id="address.state" name="address.state" value={profile.address?.state || ''} onChange={handleChange} />
+              </div>
+              <div className="input-group">
+                <label htmlFor="address.zipCode">ZIP Code</label>
+                <input type="text" id="address.zipCode" name="address.zipCode" value={profile.address?.zipCode || ''} onChange={handleChange} />
+              </div>
+              <div className="input-group">
+                <label htmlFor="address.country">Country</label>
+                <input type="text" id="address.country" name="address.country" value={profile.address?.country || ''} onChange={handleChange} />
+              </div>
+            </div>
+          </div>
+
+          <div className="form-actions">
+            <button type="submit" className="btn-save-changes" disabled={saving}>
+              <FaSave /> {saving ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

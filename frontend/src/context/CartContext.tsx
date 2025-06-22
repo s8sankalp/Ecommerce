@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
-import { CartItem, Product } from '../types';
+import { CartItem, Product } from '../types/index.ts';
 
 interface CartState {
   items: CartItem[];

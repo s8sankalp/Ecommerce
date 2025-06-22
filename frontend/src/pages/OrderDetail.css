@@ -1,0 +1,132 @@
+.order-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.back-to-orders-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: #666;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.order-detail-header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.order-detail-header p {
+  margin: 0;
+  color: #666;
+}
+
+.order-header-status .status-badge {
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+}
+
+/* Layout */
+.order-detail-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.detail-card {
+  background-color: #f8f9fa;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.detail-card:last-child {
+  margin-bottom: 0;
+}
+
+.detail-card h3 {
+  font-size: 1.2rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Ordered Items */
+.ordered-item {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+.ordered-item:last-child {
+  margin-bottom: 0;
+}
+
+.ordered-item img {
+  width: 70px;
+  height: 70px;
+  border-radius: 8px;
+}
+
+.ordered-item .item-info {
+  flex-grow: 1;
+}
+
+.ordered-item .item-info a {
+  font-weight: 600;
+  color: #333;
+  text-decoration: none;
+}
+.ordered-item .item-info span {
+  display: block;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.ordered-item .item-price {
+  font-weight: 500;
+}
+
+
+/* Order Summary Card */
+.summary-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.summary-details p {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+}
+
+.summary-total {
+  font-weight: bold;
+  font-size: 1.1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #ddd;
+  margin-top: 0.5rem;
+}
+.summary-total p {
+  font-size: 1.2rem;
+}
+
+.payment-status {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #ddd;
+}
+.payment-status h4 {
+  margin: 0 0 0.5rem 0;
+}
+.payment-status p {
+  margin: 0;
+} 

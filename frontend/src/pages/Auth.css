@@ -1,0 +1,140 @@
+.auth-page-container {
+  display: flex;
+  min-height: calc(100vh - 80px); /* Adjust 80px to your header height */
+  align-items: stretch;
+}
+
+.auth-form-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem;
+  background-color: #fff;
+}
+
+.auth-image-container {
+  flex: 1;
+  display: none; /* Hidden on smaller screens */
+}
+
+.auth-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.auth-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.auth-header h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.auth-header p {
+  color: #666;
+  margin-top: 0.5rem;
+}
+
+.auth-form {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.input-group {
+  margin-bottom: 1.5rem;
+}
+
+.input-group label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #ff6f61;
+  box-shadow: 0 0 0 3px rgba(255, 111, 97, 0.2);
+}
+
+.auth-options {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.auth-options a {
+  color: #ff6f61;
+  text-decoration: none;
+}
+
+.btn-auth {
+  width: 100%;
+  padding: 0.85rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #ff6f61;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-auth:hover {
+  background-color: #e65a50;
+}
+
+.btn-auth:disabled {
+  background-color: #f9a59d;
+  cursor: not-allowed;
+}
+
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.auth-footer-link {
+  text-align: center;
+  margin-top: 2rem;
+  color: #666;
+}
+
+.auth-footer-link a {
+  color: #ff6f61;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+@media (min-width: 768px) {
+  .auth-form-container {
+    padding: 5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .auth-image-container {
+    display: block;
+  }
+}

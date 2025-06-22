@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.tsx';
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
+import './Auth.css';
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -15,7 +17,7 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/');
+      navigate('/profile');
     }
   }, [isAuthenticated, navigate]);
 
@@ -33,61 +35,72 @@ const Login: React.FC = () => {
 
     try {
       await login(formData.email, formData.password);
-      navigate('/');
+      navigate('/profile');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed');
+      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <h1>Login</h1>
-        {error && <div className="alert alert-error">{error}</div>}
+    <div className="auth-page-container">
+      <div className="auth-form-container">
+        <div className="auth-header">
+          <h2>Welcome Back!</h2>
+          <p>Login to your QuickCart account</p>
+        </div>
         
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="email" className="form-label">Email</label>
+        {error && <div className="error-message">{error}</div>}
+        
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="input-group">
+            <label htmlFor="email">Email</label>
             <input
               type="email"
               id="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="form-control"
               required
+              placeholder="you@example.com"
             />
           </div>
           
-          <div className="form-group">
-            <label htmlFor="password" className="form-label">Password</label>
+          <div className="input-group">
+            <label htmlFor="password">Password</label>
             <input
               type="password"
               id="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="form-control"
               required
+              placeholder="••••••••"
             />
           </div>
           
+          <div className="auth-options">
+            <Link to="/forgot-password">Forgot Password?</Link>
+          </div>
+
           <button
             type="submit"
-            className="btn btn-primary"
+            className="btn-auth"
             disabled={loading}
           >
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
         
-        <div className="auth-footer">
+        <div className="auth-footer-link">
           <p>
-            Don't have an account? <Link to="/register">Register here</Link>
+            Don't have an account? <Link to="/register">Sign Up</Link>
           </p>
         </div>
+      </div>
+      <div className="auth-image-container">
+        <img src="/images/auth-bg.jpg" alt="E-commerce" />
       </div>
     </div>
   );

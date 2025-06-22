@@ -3,6 +3,7 @@ export interface User {
   name: string;
   email: string;
   role: 'user' | 'admin';
+  isAdmin: boolean;
   address?: {
     street: string;
     city: string;
@@ -118,6 +119,7 @@ export interface ProductFilters {
   minPrice?: number;
   maxPrice?: number;
   page?: number;
+  sort?: string;
 }
 
 export interface ApiResponse<T> {

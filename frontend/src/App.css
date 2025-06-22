@@ -24,77 +24,13 @@ body {
 
 .main-content {
   flex: 1;
-  padding: 20px;
-  max-width: 1200px;
+  padding: 0;
+  max-width: 100%;
   margin: 0 auto;
   width: 100%;
 }
 
-/* Header styles */
-.header {
-  background: #fff;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  padding: 1rem 0;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-.header-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.logo {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #007bff;
-  text-decoration: none;
-}
-
-.nav {
-  display: flex;
-  gap: 2rem;
-  align-items: center;
-}
-
-.nav-link {
-  text-decoration: none;
-  color: #333;
-  font-weight: 500;
-  transition: color 0.3s ease;
-}
-
-.nav-link:hover {
-  color: #007bff;
-}
-
-.cart-icon {
-  position: relative;
-  font-size: 1.2rem;
-  color: #333;
-  text-decoration: none;
-}
-
-.cart-badge {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background: #dc3545;
-  color: white;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: bold;
-}
+/* Header styles removed, now in components/Header.css */
 
 /* Button styles */
 .btn {
@@ -111,12 +47,12 @@ body {
 }
 
 .btn-primary {
-  background: #007bff;
+  background: #ff6f61;
   color: white;
 }
 
 .btn-primary:hover {
-  background: #0056b3;
+  background: #e65a50;
 }
 
 .btn-secondary {
@@ -148,12 +84,12 @@ body {
 
 .btn-outline {
   background: transparent;
-  border: 2px solid #007bff;
-  color: #007bff;
+  border: 2px solid #ff6f61;
+  color: #ff6f61;
 }
 
 .btn-outline:hover {
-  background: #007bff;
+  background: #ff6f61;
   color: white;
 }
 
@@ -194,8 +130,8 @@ body {
 
 .form-control:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+  border-color: #ff6f61;
+  box-shadow: 0 0 0 2px rgba(255, 111, 97, 0.25);
 }
 
 .form-error {
@@ -246,7 +182,7 @@ body {
 }
 
 .auth-footer a {
-  color: #007bff;
+  color: #ff6f61;
   text-decoration: none;
 }
 
@@ -255,23 +191,22 @@ body {
 }
 
 .auth-required {
+  padding: 2rem;
   text-align: center;
-  padding: 3rem;
-  color: #666;
 }
 
-/* Card styles */
+/* General card style - can be used for categories, etc. */
 .card {
-  background: white;
+  background: #fff;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  transform: translateY(-5px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
 .card-img {
@@ -281,35 +216,34 @@ body {
 }
 
 .card-body {
-  padding: 1rem;
+  padding: 1.5rem;
 }
 
 .card-title {
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 1.25rem;
   margin-bottom: 0.5rem;
-  color: #333;
+  font-weight: bold;
 }
 
 .card-text {
-  color: #666;
   margin-bottom: 1rem;
+  color: #666;
 }
 
 .card-price {
-  font-size: 1.2rem;
   font-weight: bold;
-  color: #007bff;
+  color: #333;
+  font-size: 1.2rem;
 }
 
 .card-price.original {
   text-decoration: line-through;
   color: #999;
-  margin-left: 0.5rem;
   font-size: 1rem;
+  margin-left: 0.5rem;
 }
 
-/* Grid styles */
+/* Generic Grid */
 .grid {
   display: grid;
   gap: 1.5rem;
@@ -329,30 +263,8 @@ body {
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-/* Hero section */
-.hero {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  text-align: center;
-  padding: 4rem 2rem;
-  margin-bottom: 3rem;
-  border-radius: 8px;
-}
-
-.hero h1 {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-}
-
-.hero p {
-  font-size: 1.2rem;
-  margin-bottom: 2rem;
-  opacity: 0.9;
 }
 
 /* Footer styles */

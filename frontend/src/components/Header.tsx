@@ -1,62 +1,58 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.tsx';
 import { useCart } from '../context/CartContext.tsx';
-import { FaShoppingCart, FaUser, FaSignOutAlt } from 'react-icons/fa';
+import { FaShoppingCart, FaUser, FaSearch } from 'react-icons/fa';
+import './Header.css';
 
 const Header: React.FC = () => {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { itemCount } = useCart();
-
-  const handleLogout = () => {
-    logout();
-  };
 
   return (
     <header className="header">
-      <div className="header-content">
+      <div className="header-container">
         <Link to="/" className="logo">
           ShopHub
         </Link>
         
-        <nav className="nav">
-          <Link to="/" className="nav-link">
+        <nav className="nav-menu">
+          <NavLink to="/" className="nav-link" >
             Home
-          </Link>
-          <Link to="/products" className="nav-link">
-            Products
-          </Link>
+          </NavLink>
+          <NavLink to="/products" className="nav-link">
+            Shop
+          </NavLink>
+          <NavLink to="/about" className="nav-link">
+            About Us
+          </NavLink>
+          <NavLink to="/contact" className="nav-link">
+            Contact
+          </NavLink>
+        </nav>
+
+        <div className="header-right">
+          <button className="search-btn">
+            <FaSearch />
+          </button>
           
           {isAuthenticated ? (
-            <>
-              <Link to="/profile" className="nav-link">
-                <FaUser /> Profile
-              </Link>
-              <Link to="/orders" className="nav-link">
-                Orders
-              </Link>
-              {user?.role === 'admin' && (
-                <Link to="/admin" className="nav-link">
-                  Admin
-                </Link>
-              )}
-              <button onClick={handleLogout} className="btn btn-outline">
-                <FaSignOutAlt /> Logout
-              </button>
-            </>
+            <NavLink to="/profile" className="nav-link">
+              <FaUser /> Account
+            </NavLink>
           ) : (
-            <Link to="/login" className="btn btn-primary">
-              Login
-            </Link>
+            <NavLink to="/login" className="nav-link">
+               Account
+            </NavLink>
           )}
-          
-          <Link to="/cart" className="cart-icon">
+
+          <Link to="/cart" className="cart-link">
             <FaShoppingCart />
             {itemCount > 0 && (
               <span className="cart-badge">{itemCount}</span>
             )}
           </Link>
-        </nav>
+        </div>
       </div>
     </header>
   );

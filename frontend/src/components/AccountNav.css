@@ -1,0 +1,47 @@
+/* frontend/src/components/AccountNav.css */
+
+.account-nav {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 2rem;
+}
+
+.account-nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.account-nav-item {
+  margin-bottom: 0.5rem;
+}
+
+.account-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: #666;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.account-nav-link:hover {
+  background-color: #e9ecef;
+  color: #333;
+}
+
+.account-nav-link.active {
+  background-color: #ff6f61;
+  color: white;
+}
+
+.account-nav-link svg {
+  font-size: 1.1rem;
+}
+
+.account-nav-link span {
+  font-weight: 500;
+} 
